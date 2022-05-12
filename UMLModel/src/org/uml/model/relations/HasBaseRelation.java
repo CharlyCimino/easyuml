@@ -1,6 +1,9 @@
 package org.uml.model.relations;
 
+import java.io.IOException;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.uml.model.components.ClassComponent;
 import org.uml.model.components.ComponentBase;
 
@@ -220,11 +223,17 @@ public abstract class HasBaseRelation extends RelationBase {
 
         StringBuilder fieldSignature = new StringBuilder();
         fieldSignature.append(fieldType).append(" ").append(fieldName);
-        // If the cardinality is multiple add an s to the end of the name.
+        // If the cardinality is multiple add an s to the end of the name (only if not end with "s").
         if (getCardinalityTarget().equals(CardinalityEnum.One2Many) || getCardinalityTarget().equals(CardinalityEnum.Zero2Many)) {
-            if (!getName().equals("")) {
+            if (!getName().equals("") && !getName().endsWith("s")) {
                 fieldSignature.append("s");
             }
+        }
+        try {
+            ManejadorDeArchivoDeTexto.crearArchivo("D:\\Users\\Charly\\Desktop\\salida.txt");
+            ManejadorDeArchivoDeTexto.escribirLinea("getFieldSignature() -->" + fieldSignature.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(HasBaseRelation.class.getName()).log(Level.SEVERE, null, ex);
         }
         return fieldSignature.toString();
     }
@@ -251,7 +260,13 @@ public abstract class HasBaseRelation extends RelationBase {
             fieldType.append(getCollectionType()).append("<").append(target.getName()).append(">");
         } // Else generate the ordinary type
         else {
-            fieldType.append(fieldType);
+            fieldType.append(target.getName());
+        }
+        try {
+            ManejadorDeArchivoDeTexto.crearArchivo("D:\\Users\\Charly\\Desktop\\salida.txt");
+            ManejadorDeArchivoDeTexto.escribirLinea("getFieldType() -->" + fieldType.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(HasBaseRelation.class.getName()).log(Level.SEVERE, null, ex);
         }
         return fieldType.toString();
     }

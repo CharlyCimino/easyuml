@@ -8,14 +8,19 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.ModifierSet;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.body.VariableDeclaratorId;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openide.util.Exceptions;
 import org.uml.filetype.cdg.renaming.MyMembersRenameTable;
 import org.uml.filetype.cdg.renaming.MyRelationsRenameTable;
 import org.uml.model.components.ClassComponent;
 import org.uml.model.members.Field;
 import org.uml.model.relations.HasBaseRelation;
+import org.uml.model.relations.ManejadorDeArchivoDeTexto;
+import org.uml.model.relations.RelationBase;
 import org.uml.newcode.CodeGeneratorUtils;
 
 /**
@@ -38,13 +43,13 @@ public class FieldCodeGenerator {
         // Generate fields from has relations
         // TODO disabled, because of Has relations don't yet have field modifiers etc.
         // Should explore how the standard deals with this and decide on a solution.
-//        for (RelationBase relation : component.getRelevantRelations()) {
-//            if (relation instanceof HasBaseRelation) {
-//                HasBaseRelation hasRelation = (HasBaseRelation) relation;
-//                FieldDeclaration declaration = createFieldDeclaration(hasRelation);
-//                members.add(declaration);
-//            }
-//        }
+        for (RelationBase relation : component.getRelevantRelations()) {
+            if (relation instanceof HasBaseRelation) {
+                HasBaseRelation hasRelation = (HasBaseRelation) relation;
+                FieldDeclaration declaration = createFieldDeclaration(hasRelation);
+                members.add(declaration);
+            }
+        }
     }
 
     public static void updateFields(ClassComponent component, MyMembersRenameTable memberRenames, MyRelationsRenameTable relationRenames, CompilationUnit cu) {
@@ -84,42 +89,42 @@ public class FieldCodeGenerator {
         // Generate or update fields from has relations
         // TODO disabled, because of Has relations don't yet have field modifiers etc.
         // Should explore how the standard deals with this and decide on a solution.
-//        for (RelationBase relation : component.getRelevantRelations()) {
-//            if (relation instanceof HasBaseRelation) {
-//                HasBaseRelation hasRelation = (HasBaseRelation) relation;
-//
-//                // If the field has been renamed update or generate
-//                if (relationRenames.contains(hasRelation)) {
-//                    // Find the original parsed field
-//                    String oldSignature = relationRenames.getOriginalSignature(hasRelation);
-//                    boolean found = false;
-//                    for (BodyDeclaration member : members) {
-//                        if (member instanceof FieldDeclaration) {
-//                            FieldDeclaration declaration = (FieldDeclaration) member;
-//                            // Update the original parsed field
-//                            if (oldSignature.equals(getFieldDeclarationSignature(declaration))) {
-//                                declaration.getVariables().get(0).getId().setName(hasRelation.getName());
-//                                found = true;
-//                                break;
-//                            }
-//                        }
-//                    }
-//                    // If the field has not been updated, generate it
-//                    if (!found) {
-//                        FieldDeclaration declaration = createFieldDeclaration(hasRelation);
-//                        members.add(declaration);
-//                    }
-//                } // If it has not been renamed, confirm it exists
-//                else {
-//                    FieldDeclaration declaration = findExistingDeclaration(members, hasRelation.getFieldSignature());
-//                    // If it doesn't exits, create and add it
-//                    if (declaration == null) {
-//                        declaration = createFieldDeclaration(hasRelation);
-//                        members.add(declaration);
-//                    }
-//                }
-//            }
-//        }
+        for (RelationBase relation : component.getRelevantRelations()) {
+            if (relation instanceof HasBaseRelation) {
+                HasBaseRelation hasRelation = (HasBaseRelation) relation;
+
+                // If the field has been renamed update or generate
+                if (relationRenames.contains(hasRelation)) {
+                    // Find the original parsed field
+                    String oldSignature = relationRenames.getOriginalSignature(hasRelation);
+                    boolean found = false;
+                    for (BodyDeclaration member : members) {
+                        if (member instanceof FieldDeclaration) {
+                            FieldDeclaration declaration = (FieldDeclaration) member;
+                            // Update the original parsed field
+                            if (oldSignature.equals(getFieldDeclarationSignature(declaration))) {
+                                declaration.getVariables().get(0).getId().setName(hasRelation.getName());
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    // If the field has not been updated, generate it
+                    if (!found) {
+                        FieldDeclaration declaration = createFieldDeclaration(hasRelation);
+                        members.add(declaration);
+                    }
+                } // If it has not been renamed, confirm it exists
+                else {
+                    FieldDeclaration declaration = findExistingDeclaration(members, hasRelation.getFieldSignature());
+                    // If it doesn't exits, create and add it
+                    if (declaration == null) {
+                        declaration = createFieldDeclaration(hasRelation);
+                        members.add(declaration);
+                    }
+                }
+            }
+        }
     }
 
     private static FieldDeclaration findExistingDeclaration(List<BodyDeclaration> declarations, String signature) {
@@ -167,11 +172,13 @@ public class FieldCodeGenerator {
 
     private static FieldDeclaration createFieldDeclaration(HasBaseRelation hasRelation) {
         try {
-            String signature = hasRelation.getFieldSignature() + ";";
+            ManejadorDeArchivoDeTexto.crearArchivo("D:\\Users\\Charly\\Desktop\\salida.txt");
+            String signature = "private " + hasRelation.getFieldSignature() + ";";
+            ManejadorDeArchivoDeTexto.escribirLinea("createFieldDeclaration() signature -->" + signature);
             BodyDeclaration bd = JavaParser.parseBodyDeclaration(signature);
             FieldDeclaration declaration = (FieldDeclaration) bd;
             return declaration;
-        } catch (ParseException ex) {
+        } catch (ParseException | IOException ex) {
             Exceptions.printStackTrace(ex);
         }
         return null;
