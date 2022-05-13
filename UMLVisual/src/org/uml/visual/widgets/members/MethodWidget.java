@@ -30,7 +30,7 @@ public class MethodWidget extends MemberWidgetBase implements ISignedUMLWidget {
         nameLabel.setLabel(method.getLabelText(getClassDiagramScene().isShowSimpleTypes()));
         nameLabel.getActions().addAction(ActionFactory.createInplaceEditorAction(new MemberNameEditor(this)));
         nameLabel.setFont(scene.getFont());
-        setStatic(method.isStatic());
+        setFontStyle(method.isStatic(), method.isAbstract());
         this.addChild(nameLabel);
         setChildConstraint(nameLabel, 1);   // any number, as it defines weight by which it will occupy the parent space
     }
@@ -56,6 +56,11 @@ public class MethodWidget extends MemberWidgetBase implements ISignedUMLWidget {
         return member.getSignature();
     }
 
+    private void setFontStyle(boolean isStatic, boolean isAbstract) {
+        setStatic(isStatic);
+        setAbstract(isAbstract);
+    }
+    
     private void setStatic(boolean isStatic) {
         Map<TextAttribute, Integer> fontAttributes = new HashMap<>();
         if (isStatic) {
@@ -65,6 +70,17 @@ public class MethodWidget extends MemberWidgetBase implements ISignedUMLWidget {
         }
         nameLabel.setFont(nameLabel.getFont().deriveFont(fontAttributes));
     }
+    
+    private void setAbstract(boolean isAbstract) {
+        Map<TextAttribute, Float> fontAttributes = new HashMap<>();
+        if (isAbstract) {
+            fontAttributes.put(TextAttribute.POSTURE, TextAttribute.POSTURE_OBLIQUE);
+        } else {
+            fontAttributes.put(TextAttribute.POSTURE, -1f);
+        }
+        nameLabel.setFont(nameLabel.getFont().deriveFont(fontAttributes));
+    }
+    
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -72,6 +88,9 @@ public class MethodWidget extends MemberWidgetBase implements ISignedUMLWidget {
         if ("isStatic".equals(propName)) {
             updateIcon();
             setStatic((boolean) evt.getNewValue());
+        } else if ("isAbstract".equals(propName)) {
+            updateIcon();
+            setAbstract((boolean) evt.getNewValue());
         } else if ("isFinal".equals(propName) || "isAbstract".equals(propName) || "isSynchronized".equals(propName) || "name".equals(propName) || "type".equals(propName) || "arguments".equals(propName)) {
             nameLabel.setLabel(((Method) member).getLabelText(getClassDiagramScene().isShowSimpleTypes()));
         } else if ("visibility".equals(evt.getPropertyName())) {
