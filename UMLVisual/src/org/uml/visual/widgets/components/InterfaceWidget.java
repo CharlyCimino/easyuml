@@ -1,6 +1,7 @@
 package org.uml.visual.widgets.components;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.MouseListener;
 import java.util.concurrent.Callable;
 import org.uml.visual.widgets.members.MethodWidget;
@@ -32,6 +33,8 @@ public class InterfaceWidget extends ComponentWidgetBase {
 
         LabelWidget interfaceLabel = new LabelWidget(scene, "<<interface>>");
         headerWidget.addChild(interfaceLabel);
+        
+        nameLabel.setFont(nameLabel.getScene().getFont().deriveFont(Font.ITALIC));
         
         iconNameContainer.addChild(iconWidget);
         iconNameContainer.addChild(nameLabel);
@@ -73,6 +76,7 @@ public class InterfaceWidget extends ComponentWidgetBase {
     
     public void addMethodWidget() {
         Method method = new Method("untitledMethod", "void");
+        method.setAbstract(true);
         getComponent().addMethod(method);
         MethodWidget methodWidget = new MethodWidget(getClassDiagramScene(), method);
         addMember(methodsContainer, methodWidget);

@@ -36,14 +36,7 @@ public class ClassWidget extends ComponentWidgetBase {
         super(scene, classComponent);
 
         // Header
-        if (classComponent.isAbstract()) {
-            LabelWidget abstractLabel = new LabelWidget(headerWidget.getScene(), "<<abstract>>");
-            abstractLabel.setFont(headerWidget.getScene().getFont().deriveFont(Font.ITALIC));
-            headerWidget.addChild(abstractLabel);
-            setMinimumSize(MIN_DIMENSION_2ROW);
-        } else {
-            setMinimumSize(MIN_DIMENSION_1ROW);
-        }
+        updateAbstractLabel(classComponent.isAbstract());
         iconNameContainer.addChild(iconWidget);
         iconNameContainer.addChild(nameLabel);
         headerWidget.addChild(iconNameContainer);
@@ -169,15 +162,11 @@ public class ClassWidget extends ComponentWidgetBase {
 
     private void updateAbstractLabel(boolean isAbstract) {
         if (isAbstract) {
-            LabelWidget abstractLabel = new LabelWidget(headerWidget.getScene(), "<<abstract>>");
-            abstractLabel.setFont(headerWidget.getScene().getFont().deriveFont(Font.ITALIC));
-            abstractLabel.setAlignment(LabelWidget.Alignment.CENTER);
-            headerWidget.addChild(0, abstractLabel);
-            setMinimumSize(MIN_DIMENSION_2ROW);
+            nameLabel.setFont(nameLabel.getScene().getFont().deriveFont(Font.ITALIC));
         } else {
-            headerWidget.removeChild(headerWidget.getChildren().get(0));
-            setMinimumSize(MIN_DIMENSION_1ROW);
+            nameLabel.setFont(nameLabel.getScene().getFont().deriveFont(Font.PLAIN));
         }
+        setMinimumSize(MIN_DIMENSION_1ROW);
         getScene().validate();
     }
 }
